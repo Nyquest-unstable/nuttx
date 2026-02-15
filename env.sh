@@ -50,10 +50,17 @@ if [ -f ".config" ]; then
         read -p "Do you want to reconfigure to $BOARD_CONFIG? (y/N): " -n 1 -r
         echo
         if [[ $REPLY =~ ^[Yy]$ ]]; then
+            echo "Removing existing configuration files..."
+            
+            # 删除所有配置文件
+            rm -f .config .config.backup .config.old .config.orig
+            
+            echo "Existing configuration files removed."
             echo "Reconfiguring NuttX for: $BOARD_CONFIG"
             
-            # 进入NuttX根目录
-            cd "$(dirname "$0")"
+            # 进入NuttX根目录（使用脚本所在目录的绝对路径）
+            SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+            cd "$SCRIPT_DIR"
             
             # 使用configure.sh脚本配置NuttX
             ./tools/configure.sh $BOARD_CONFIG
@@ -73,20 +80,25 @@ else
         BOARD_CONFIG=$1
         echo "Configuring NuttX for: $BOARD_CONFIG"
 
-        # 进入NuttX根目录
-        cd "$(dirname "$0")"
+        # 删除可能存在的配置文件
+        rm -f .config .config.backup .config.old .config.orig
+
+        # 进入NuttX根目录（使用脚本所在目录的绝对路径）
+        SCRIPT_DIR="$(pwd)"
+        cd "$SCRIPT_DIR"
 
         # 使用configure.sh脚本配置NuttX
         ./tools/configure.sh $BOARD_CONFIG
         
         echo "NuttX configured successfully."
     else
-        # 默认配置为 esp32s3-box:buttons
-        BOARD_CONFIG="esp32s3-box:buttons"
+        # 默认配置为 esp32s3-box:zc-lite-feature
+        BOARD_CONFIG="esp32s3-box:zc-lite-feature"
         echo "NuttX is not configured yet. Using default configuration: $BOARD_CONFIG"
         
-        # 进入NuttX根目录
-        cd "$(dirname "$0")"
+        # 进入NuttX根目录（使用脚本所在目录的绝对路径）
+        SCRIPT_DIR="$(pwd)"
+        cd "$SCRIPT_DIR"
         ./tools/configure.sh $BOARD_CONFIG
         echo "NuttX configured successfully with $BOARD_CONFIG."
     fi
